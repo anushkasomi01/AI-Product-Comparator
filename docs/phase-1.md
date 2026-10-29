@@ -226,7 +226,8 @@ Do not solve TLS or authentication problems by disabling certificate checks, byp
 - [x] Safe validation/error handling, bounded timeouts/retries, health, correlation IDs, graceful shutdown.
 - [x] Unit, HTTP integration, hosted configuration, and opt-in live tests written.
 - [x] Architecture, OpenAPI, setup, security limitations, and Git instructions documented.
-- [ ] Build/test execution and live-model verification recorded in [verification.md](verification.md).
-- [ ] Milestone commit pushed and remote SHA/CI verified.
+- [x] Build/test execution and live-model verification recorded in [verification.md](verification.md): 28 deterministic tests passed; real Ollama service and packaged HTTP calls passed.
+- [x] Milestone commits pushed to the existing repository's fixed session branch; remote SHAs and CI verified.
+- [ ] Separately named public repository created by the user and second remote connected (blocked by integration permissions, not by the application code).
 
 Only move to Phase 2 after the execution gates pass. Phase 2 starts with structured criteria extraction and Java validation—not marketplace scraping or recommendations.

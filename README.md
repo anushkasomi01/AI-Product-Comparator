@@ -17,6 +17,8 @@ Implemented:
 
 See the [Phase 1 guide](docs/phase-1.md) for the concepts, complete code map, execution flow, tests, and troubleshooting.
 
+**Verified:** 28 deterministic tests passed, and a real Ollama model answered through both the service and the packaged HTTP endpoint on GitHub Actions. Exact run links and limitations are in the [verification log](docs/verification.md).
+
 ## Compatible version baseline
 
 | Component | Version / choice |

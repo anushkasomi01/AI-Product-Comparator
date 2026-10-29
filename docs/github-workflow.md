@@ -71,7 +71,7 @@ git add README.md .editorconfig .env.example .gitattributes .gitignore \
   src/main/java src/main/resources \
   src/test/java src/test/resources \
   docs/architecture.md docs/github-workflow.md docs/limitations.md \
-  docs/openapi.yaml docs/phase-1.md \
+  docs/openapi.yaml docs/phase-1.md docs/verification.md \
   scripts/check-no-secrets.sh \
   .github/workflows/ci.yml .github/workflows/live-model-smoke.yml
 
