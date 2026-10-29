@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: live-ollama-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -58,5 +62,8 @@ jobs:
           with open(os.environ['RUNNER_TEMP'] + '/reply.json') as source:
               reply = json.load(source)
           assert isinstance(reply.get('answer'), str) and reply['answer'].strip(), 'Missing model answer'
-          print('PASS: real model returned a nonempty answer through POST /api/chat')
+          message = 'PASS: real Ollama returned a nonempty answer through POST /api/chat'
+          print('::notice title=Live model verification::' + message)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write('## Live model verification\n\n' + message + '\n')
           PY
