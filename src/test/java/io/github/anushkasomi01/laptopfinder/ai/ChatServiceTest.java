@@ -3,6 +3,7 @@ package io.github.anushkasomi01.laptopfinder.ai;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +25,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.core.io.ClassPathResource;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +38,8 @@ class ChatServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Spring AI 2 reads model options for every call; a bare Mockito mock returns null.
+        lenient().when(chatModel.getOptions()).thenReturn(ChatOptions.builder().build());
         ChatClient client = new ChatConfiguration().chatClient(ChatClient.builder(chatModel),
                 new ClassPathResource("prompts/assistant-system.txt"));
         service = new ChatService(client);

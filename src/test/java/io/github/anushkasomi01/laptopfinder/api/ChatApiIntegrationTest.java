@@ -3,6 +3,7 @@ package io.github.anushkasomi01.laptopfinder.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -56,6 +58,7 @@ class ChatApiIntegrationTest {
     @BeforeEach
     void setUp() {
         reset(chatModel);
+        lenient().when(chatModel.getOptions()).thenReturn(ChatOptions.builder().build());
         applicationLogger = (Logger) LoggerFactory.getLogger("io.github.anushkasomi01.laptopfinder");
         logAppender = new ListAppender<>();
         logAppender.start();
