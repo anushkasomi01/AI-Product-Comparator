@@ -1,0 +1,16 @@
+# Activate with SPRING_PROFILES_ACTIVE=hosted.
+# No fallback key: missing OPENAI_API_KEY fails configuration resolution at startup.
+spring:
+  ai:
+    model:
+      chat: openai
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+      api-key: ${OPENAI_API_KEY}
+      timeout: ${AI_READ_TIMEOUT:60s}
+      max-retries: ${OPENAI_MAX_RETRIES:0}
+      chat:
+        model: ${OPENAI_MODEL:gpt-4.1-mini}
+        temperature: 0.2
+        max-completion-tokens: 512
+        store: false

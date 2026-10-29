@@ -1,0 +1,43 @@
+# Build output and runtime files
+/target/
+*.class
+*.jar.original
+*.log
+/logs/
+hs_err_pid*
+replay_pid*
+
+# Local configuration and secrets (the example and wrapper JAR are intentional)
+.env
+.env.*
+!.env.example
+application-local.*
+application-*-local.*
+*.pem
+*.key
+*.p12
+*.jks
+!**/src/test/resources/**/test-only-*.p12
+.mvn/wrapper/maven-wrapper.jar.tmp
+
+# IDE / OS files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+.factorypath
+.DS_Store
+Thumbs.db
+
+# Local tooling / databases / model weights
+.tools/
+.venv/
+.ollama/
+models/
+*.gguf
+/data/
+pgdata/

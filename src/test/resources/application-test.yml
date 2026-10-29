@@ -1,0 +1,14 @@
+# No provider calls in deterministic tests. Test configurations supply ChatModel.
+spring:
+  ai:
+    model:
+      chat: none
+    retry:
+      max-attempts: 1
+  http:
+    clients:
+      connect-timeout: 200ms
+      read-timeout: 300ms
+logging:
+  level:
+    root: WARN

@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: laptop-finder
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+  ai:
+    model:
+      chat: ollama
+      embedding: none
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      init:
+        # Pull models explicitly; application startup must not download weights.
+        pull-model-strategy: never
+      chat:
+        # Spring AI 2 uses flat chat properties, not the older chat.options prefix.
+        model: ${OLLAMA_MODEL:qwen2.5:7b-instruct}
+        temperature: 0.2
+        num-predict: 512
+    retry:
+      max-attempts: ${AI_MAX_ATTEMPTS:1}
+      on-client-errors: false
+      backoff:
+        initial-interval: 500ms
+        multiplier: 2
+        max-interval: 2s
+  http:
+    clients:
+      connect-timeout: ${AI_CONNECT_TIMEOUT:5s}
+      read-timeout: ${AI_READ_TIMEOUT:60s}
+
+server:
+  address: ${SERVER_ADDRESS:127.0.0.1}
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},%X{requestId:-}] "
+  level:
+    root: INFO
+    # Do not enable HTTP-body or prompt logging in a shared environment.
+    org.springframework.ai: INFO
+    org.springframework.web.client: INFO

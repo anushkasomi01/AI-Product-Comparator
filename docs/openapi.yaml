@@ -1,0 +1,165 @@
+openapi: 3.0.3
+info:
+  title: AI Multi-Marketplace Laptop Finder API
+  version: 0.1.0
+  description: |
+    Phase 1 contract. POST /api/chat calls a real configured LLM through Spring AI.
+    It is stateless and has no live marketplace data, tools, or RAG.
+    This specification is maintained alongside the API and covered by contract tests;
+    generated interactive OpenAPI documentation is planned for a later milestone.
+servers:
+  - url: http://localhost:8080
+    description: Local development only
+paths:
+  /api/chat:
+    post:
+      operationId: chat
+      summary: Ask a general laptop or development question
+      description: |
+        One independent model call per request. No conversation memory is retained.
+        Responses are general model guidance, not verified product recommendations.
+        The message limit is 4000 Java UTF-16 code units, not a token limit.
+      parameters:
+        - name: X-Request-ID
+          in: header
+          required: false
+          description: Ignored for trust reasons. The server always generates a new UUID.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            example:
+              message: What should I consider when choosing a laptop for Java and Docker?
+      responses:
+        '200':
+          description: Nonempty model answer
+          headers:
+            X-Request-ID:
+              $ref: '#/components/headers/RequestId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatReply'
+              example:
+                answer: Consider RAM, CPU performance, storage, and your operating-system requirements.
+        '400':
+          description: Missing, blank, oversized, or malformed input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '405':
+          description: Method other than POST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Unknown endpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '415':
+          description: Content-Type other than application/json
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected application error; internal details are not returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '502':
+          description: Model returned an empty answer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '503':
+          description: Provider unavailable, unauthorized, or timed out; retry according to the code and configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /actuator/health:
+    get:
+      operationId: health
+      summary: Application liveness/readiness overview
+      description: Does not call the model. UP does not prove that a model is installed or reachable.
+      responses:
+        '200':
+          description: Application is up
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    enum: [UP]
+components:
+  headers:
+    RequestId:
+      description: Server-generated correlation UUID, also present in error bodies and application MDC logs.
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ChatRequest:
+      type: object
+      additionalProperties: false
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 4000
+          description: Must contain non-whitespace text. Surrounding whitespace is trimmed before the model call.
+    ChatReply:
+      type: object
+      additionalProperties: false
+      required: [answer]
+      properties:
+        answer:
+          type: string
+          minLength: 1
+          description: Generated general guidance; not a verified marketplace result.
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [timestamp, status, code, message, requestId, fieldErrors]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        code:
+          type: string
+          enum: [VALIDATION_ERROR, INVALID_JSON, UNSUPPORTED_MEDIA_TYPE, METHOD_NOT_ALLOWED, NOT_FOUND, EMPTY_MODEL_RESPONSE, MODEL_UNAVAILABLE, INTERNAL_ERROR]
+        message:
+          type: string
+        requestId:
+          type: string
+          format: uuid
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, message]
+            properties:
+              field:
+                type: string
+              message:
+                type: string
