@@ -1,6 +1,6 @@
 name: Live Ollama smoke test
 
-# Explicitly requested only: downloads a small model and uses CI compute.
+# Manual or workflow-change verification: downloads a small model and uses CI compute.
 on:
   workflow_dispatch:
   push:
@@ -20,8 +20,8 @@ jobs:
       OLLAMA_BASE_URL: http://127.0.0.1:11434
       RUN_LIVE_AI_TESTS: 'true'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
