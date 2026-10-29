@@ -54,9 +54,29 @@ jobs:
                   text = line[:3000].replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
                   print('::error file=pom.xml::' + text)
           PY
+      - name: Publish test totals
+        if: always()
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import xml.etree.ElementTree as ET
+          totals = dict(tests=0, failures=0, errors=0, skipped=0)
+          reports = list(Path('target/surefire-reports').glob('TEST-*.xml'))
+          for report in reports:
+              root = ET.parse(report).getroot()
+              for key in totals:
+                  totals[key] += int(root.get(key, 0))
+          executed = totals['tests'] - totals['skipped']
+          summary = (f"Deterministic suite: {executed} executed, {totals['failures']} failures, "
+                     f"{totals['errors']} errors, {totals['skipped']} opt-in live tests skipped.")
+          print('::notice title=Test results::' + summary)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write('## Test results\n\n' + summary + '\n')
+          PY
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: backend-test-reports
           path: |
